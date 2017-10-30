@@ -48,12 +48,6 @@
          <height>600</height>
         </size>
        </property>
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
        <zorder>difficulty</zorder>
        <zorder>difficulty</zorder>
        <zorder>groupBox</zorder>

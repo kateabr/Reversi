@@ -14,7 +14,6 @@ public slots:
   void setChips(Chip user, Chip comp);
   void setStartGame(bool s);
   void setDifficulty(int val);
-  void initComputerMoves();
 
 protected:
   void paintEvent(QPaintEvent *);
