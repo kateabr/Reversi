@@ -6,6 +6,7 @@ Canvas::Canvas(QWidget *parent) : QWidget(parent), cp(b) {}
 void Canvas::setChips(Chip user, Chip comp) {
   b.initChips(user, comp);
   cp.initChips(user, comp);
+  userChip = user;
   repaint();
 }
 
@@ -75,5 +76,6 @@ void Canvas::mousePressEvent(QMouseEvent *e) {
   b.putChip(x, y, userChip);
   b.moveMade(y * 8 + x);
   cp.updateAvailableMoves(y * 8 + x);
+  b.updateLayout(x, y);
   repaint();
 }

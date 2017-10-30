@@ -18,6 +18,9 @@ bool ComputerPlayer::computerCanPutChip(int ind) {
 void ComputerPlayer::setDifficulty(int val) { difficulty = val; }
 
 void ComputerPlayer::updateAvailableMoves(int newChip) {
+  int i = newChip % 8;
+  int j = newChip / 8;
+
   int pos;
   if ((pos = canPutChipDown(newChip)) != -1)
     availableMoves.insert(pos);

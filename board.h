@@ -38,6 +38,7 @@ public:
   Board(Board &&other);
   Board &operator=(const Board &other);
   Board &operator=(Board &&other);
+  void updateLayout(int x, int y);
 
 public slots:
   void initializeAvailableMoves();

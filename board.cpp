@@ -102,6 +102,45 @@ Board &Board::operator=(Board &&other) {
   return *this;
 }
 
+void Board::updateLayout(int x, int y) {
+  int xx = x;
+  while (xx >= 0) {
+    if (getChip(xx - 1, y) == userChip)
+      break;
+    --xx;
+  }
+  if (xx >= 0)
+    for (int i = xx; i < x; ++i)
+      putChip(i, y, userChip);
+  xx = x;
+  while (xx < 8) {
+    if (getChip(xx + 1, y) == userChip)
+      break;
+    ++xx;
+  }
+  if (xx < 8)
+    for (int i = x + 1; i <= xx; ++i)
+      putChip(i, y, userChip);
+  int yy = y;
+  while (yy >= 0) {
+    if (getChip(x, yy - 1) == userChip)
+      break;
+    --yy;
+  }
+  if (yy >= 0)
+    for (int j = yy; j < y; ++j)
+      putChip(x, j, userChip);
+  yy = y;
+  while (yy < 8) {
+    if (getChip(x, yy + 1) == userChip)
+      break;
+    ++yy;
+  }
+  if (yy < 8)
+    for (int j = y + 1; j <= yy; ++j)
+      putChip(x, j, userChip);
+}
+
 void Board::generateHash() {
   boardHash = 0;
   std::hash<std::string> strHash;
