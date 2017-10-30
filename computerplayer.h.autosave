@@ -21,6 +21,7 @@ private:
   Chip userChip = Chip::Black;
   int difficulty = 1;
   QSet<int> availableMoves;
+  
 
   int canPutChipRight(int ind);
   int canPutChipLeft(int ind);
