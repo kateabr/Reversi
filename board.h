@@ -20,11 +20,17 @@ public:
   bool final() const;
   int heuristic() const;
   const Chip *getLayout() const;
-  const Chip &getChip(int i, int j) const;
+  Chip getChip(int i, int j) const;
+  Chip getChip(int ind) const;
   void putChip(int i, int j, Chip ch);
   size_t getHash() const;
   void print() const;
   void clearLayout();
+  bool layoutIsEmpty();
+  QList<QPair<int, int>> getPossibleMoves();
+  void initChips(Chip user, Chip comp);
+  bool canPutChip(int ind);
+  void moveMade(int ind);
 
   Board();
   ~Board();
@@ -33,12 +39,16 @@ public:
   Board &operator=(const Board &other);
   Board &operator=(Board &&other);
 
+public slots:
+  void initializeAvailableMoves();
+
 private:
   Chip *layout;
+  Chip userChip = Chip::Black;
+  Chip computerChip = Chip::White;
   size_t boardHash;
   void generateHash();
-  size_t whiteChips = 0;
-  size_t blackChips = 0;
+  QSet<int> availableMoves;
 };
 
 #endif // BOARD_H

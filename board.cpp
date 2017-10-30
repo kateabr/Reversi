@@ -9,7 +9,9 @@ Board Board::MakeBoard() {
 
 const Chip *Board::getLayout() const { return layout; }
 
-const Chip &Board::getChip(int i, int j) const { return layout[j * 8 + i]; }
+Chip Board::getChip(int i, int j) const { return layout[j * 8 + i]; }
+
+Chip Board::getChip(int ind) const { return layout[ind]; }
 
 void Board::putChip(int i, int j, Chip ch) { layout[j * 8 + i] = ch; }
 
@@ -25,6 +27,10 @@ void Board::print() const {
 void Board::clearLayout() {
   for (int i = 0; i < 64; ++i)
     layout[i] = Chip::Empty;
+  putChip(3, 4, Chip::Black);
+  putChip(4, 3, Chip::Black);
+  putChip(3, 3, Chip::White);
+  putChip(4, 4, Chip::White);
 }
 
 bool Board::layoutIsEmpty() {
@@ -32,6 +38,38 @@ bool Board::layoutIsEmpty() {
     if (layout[i] != Chip::Empty)
       return false;
   return true;
+}
+
+QList<QPair<int, int>> Board::getPossibleMoves() {
+  for (int i = 0; i < 64; ++i) {
+  }
+}
+
+void Board::initChips(Chip user, Chip comp) {
+  userChip = user;
+  computerChip = comp;
+  initializeAvailableMoves();
+}
+
+void Board::initializeAvailableMoves() {
+  availableMoves.clear();
+  if (userChip == Chip::Black) {
+    availableMoves.insert(19);
+    availableMoves.insert(26);
+    availableMoves.insert(37);
+    availableMoves.insert(44);
+  } else {
+    availableMoves.insert(20);
+    availableMoves.insert(29);
+    availableMoves.insert(34);
+    availableMoves.insert(43);
+  }
+}
+
+bool Board::canPutChip(int ind) { return availableMoves.contains(ind); }
+
+void Board::moveMade(int ind) {
+  availableMoves.erase(availableMoves.find(ind));
 }
 
 bool Board::final() const { return true; }
@@ -74,4 +112,12 @@ void Board::generateHash() {
   boardHash = strHash(tempHash);
 }
 
-Board::Board() : layout(nullptr) {}
+Board::Board() {
+  layout = new Chip[64]();
+  putChip(3, 4, Chip::Black);
+  putChip(4, 3, Chip::Black);
+  putChip(3, 3, Chip::White);
+  putChip(4, 4, Chip::White);
+  generateHash();
+  initializeAvailableMoves();
+}

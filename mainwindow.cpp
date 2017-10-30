@@ -5,15 +5,16 @@ MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent), ui(new Ui::MainWindow) {
   ui->setupUi(this);
   connect(ui->blackChips, &QRadioButton::clicked,
-          [&]() { ui->frame->setUserChips(Chip::Black); });
+          [&]() { ui->frame->setChips(Chip::Black, Chip::White); });
   connect(ui->whiteChips, &QRadioButton::clicked,
-          [&]() { ui->frame->setUserChips(Chip::White); });
+          [&]() { ui->frame->setChips(Chip::White, Chip::Black); });
   connect(ui->difficulty, &QSlider::valueChanged, [&](int val) {
     ui->groupBox_2->setTitle("Difficulty: " + QString::number(val));
   });
   connect(ui->startGame, &QPushButton::clicked, [&]() {
     setControlsEnabled(false);
     ui->frame->repaint();
+    ui->frame->setDifficulty(ui->difficulty->value());
   });
   connect(ui->endGame, &QPushButton::clicked,
           [&]() { setControlsEnabled(true); });

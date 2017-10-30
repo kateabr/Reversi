@@ -55,10 +55,39 @@
         <enum>QFrame::Raised</enum>
        </property>
        <zorder>difficulty</zorder>
+       <zorder>difficulty</zorder>
+       <zorder>groupBox</zorder>
       </widget>
      </item>
      <item row="1" column="0">
       <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="2">
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QPushButton" name="startGame">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Start game</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="endGame">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>End game</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
        <item row="0" column="1">
         <widget class="QGroupBox" name="groupBox_2">
          <property name="sizePolicy">
@@ -138,33 +167,6 @@
           </item>
          </layout>
         </widget>
-       </item>
-       <item row="0" column="2">
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <widget class="QPushButton" name="startGame">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Start game</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="endGame">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>End game</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
        </item>
       </layout>
      </item>

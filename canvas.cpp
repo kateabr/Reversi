@@ -1,15 +1,24 @@
-#include "canvas.h"
+﻿#include "canvas.h"
 #include <QtConcurrent/QtConcurrent>
 
-Canvas::Canvas(QWidget *parent) : QWidget(parent) { b = Board::MakeBoard(); }
+Canvas::Canvas(QWidget *parent) : QWidget(parent), cp(b) {}
 
-void Canvas::setUserChips(Chip ch) { userChip = ch; }
+void Canvas::setChips(Chip user, Chip comp) {
+  b.initChips(user, comp);
+  cp.initChips(user, comp);
+  repaint();
+}
 
 void Canvas::setStartGame(bool s) {
   gameStarted = s;
-  if (!s)
+  if (!s) {
     b.clearLayout();
+    b.initializeAvailableMoves();
+    cp.initializeAvailableMoves();
+  }
 }
+
+void Canvas::setDifficulty(int val) { cp.setDifficulty(val); }
 
 void Canvas::paintEvent(QPaintEvent *) {
   QPainter p(this);
@@ -33,8 +42,18 @@ void Canvas::paintEvent(QPaintEvent *) {
 
   for (int j = 0; j < 8; ++j)
     for (int i = 0; i < 8; ++i) {
-      if (b.getChip(i, j) == Chip::Empty)
+      if (b.getChip(i, j) == Chip::Empty) {
+        if (b.canPutChip(j * 8 + i)) {
+          p.setBrush(Qt::green);
+          p.drawEllipse(QPointF((2 * i + 1) * radX, (2 * j + 1) * radY), 10,
+                        10);
+        } else if (cp.computerCanPutChip(j * 8 + i)) {
+          p.setBrush(Qt::red);
+          p.drawEllipse(QPointF((2 * i + 1) * radX, (2 * j + 1) * radY), 10,
+                        10);
+        }
         continue;
+      }
       if (b.getChip(i, j) == Chip::White)
         p.setBrush(Qt::white);
       else
@@ -51,8 +70,10 @@ void Canvas::mousePressEvent(QMouseEvent *e) {
   QPoint curPos = e->pos();
   size_t x = curPos.x() / squareWidth;
   size_t y = curPos.y() / squareWidth;
-  if (b.getChip(x, y) != Chip::Empty)
+  if ((b.getChip(x, y) != Chip::Empty) || (!b.canPutChip(y * 8 + x)))
     return;
   b.putChip(x, y, userChip);
+  b.moveMade(y * 8 + x);
+  cp.updateAvailableMoves(y * 8 + x);
   repaint();
 }
