@@ -17,20 +17,48 @@ bool ComputerPlayer::computerCanPutChip(int ind) {
 void ComputerPlayer::setDifficulty(int val) { difficulty = val; }
 
 void ComputerPlayer::updateAvailableMoves() {
-  int ind = 0;
-  while ((!availableMoves.empty()) && (ind != availableMoves.size())) {
-    if (!b->areThereChips((availableMoves.begin() + ind).key(),
-                          (availableMoves.begin() + ind).value(), computerChip,
-                          userChip)) {
-      availableMoves.erase(availableMoves.begin() + ind);
-    } else
-      ++ind;
+  b->updateAvailableMoves(computerChip, userChip, availableMoves, playerLayout);
+}
+
+int ComputerPlayer::makeMove() {
+  if (availableMoves.size() > 1) {
+    int rnd = rand() % availableMoves.size();
+    rnd = (availableMoves.begin() + rnd).key();
+    b->putChip(rnd, computerChip, false);
+    playerLayout.insert(rnd);
+    moveMade(rnd);
+    return rnd;
+  }
+  int rnd = availableMoves.begin().key();
+  b->putChip(rnd, computerChip, false);
+  playerLayout.insert(rnd);
+  moveMade(rnd);
+  return rnd;
+}
+
+QList<int> ComputerPlayer::updateLayout(int x, int y) {
+  return b->updateLayout(x, y, computerChip);
+}
+
+void ComputerPlayer::updatePlayerLayout(const QList<int> &takenChips,
+                                        bool add) {
+  for (int pos : takenChips) {
+    auto it = std::find(playerLayout.begin(), playerLayout.end(), pos);
+    if (!add) {
+      if (it != playerLayout.end())
+        playerLayout.erase(it);
+    } else {
+      if (it == playerLayout.end())
+        playerLayout.insert(pos);
+    }
   }
 }
 
+int ComputerPlayer::getAvMLength() { return availableMoves.size(); }
+
 void ComputerPlayer::initializeAvailableMoves() {
   availableMoves.clear();
-  b->initializeAvailableMoves(computerChip, availableMoves);
+  b->initializeAvailableMoves(computerChip, availableMoves, playerLayout);
 }
 
 int ComputerPlayer::canPutChipRight(int ind) {

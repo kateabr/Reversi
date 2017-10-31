@@ -13,7 +13,15 @@ Chip Board::getChip(int i, int j) const { return layout[j * 8 + i]; }
 
 Chip Board::getChip(int ind) const { return layout[ind]; }
 
-void Board::putChip(int i, int j, Chip ch) { layout[j * 8 + i] = ch; }
+void Board::putChip(int i, int j, Chip ch, bool push) {
+  layout[j * 8 + i] = ch;
+  if (push)
+    playerLayout.insert(j * 8 + i);
+}
+
+void Board::putChip(int ind, Chip ch, bool push) {
+  putChip(ind % 8, ind / 8, ch, push);
+}
 
 size_t Board::getHash() const { return boardHash; }
 
@@ -43,45 +51,230 @@ bool Board::layoutIsEmpty() {
 void Board::initChips(Chip user, Chip comp) {
   userChip = user;
   computerChip = comp;
-  initializeAvailableMoves(userChip, availableMoves);
+  initAvM();
 }
 
-void Board::initializeAvailableMoves(Chip user, QMap<int, Direction> &avm) {
+void Board::initializeAvailableMoves(Chip user, QMap<int, Direction> &avm,
+                                     QSet<int> &pl) {
   avm.clear();
+  pl.clear();
   if (user == Chip::Black) {
     avm.insert(19, Direction::Down);
     avm.insert(26, Direction::Right);
     avm.insert(37, Direction::Left);
     avm.insert(44, Direction::Up);
+    pl.insert(28);
+    pl.insert(35);
   } else {
     avm.insert(20, Direction::Down);
     avm.insert(29, Direction::Left);
     avm.insert(34, Direction::Right);
     avm.insert(43, Direction::Up);
+    pl.insert(27);
+    pl.insert(36);
   }
 }
 
-void Board::initAvM() { initializeAvailableMoves(userChip, availableMoves); }
+void Board::initAvM() {
+  initializeAvailableMoves(userChip, availableMoves, playerLayout);
+}
+
+void Board::updAvM() {
+  updateAvailableMoves(userChip, computerChip, availableMoves, playerLayout);
+}
+
+void Board::updatePlayerLayout(const QList<int> &takenChips, bool add) {
+  for (int pos : takenChips) {
+    auto it = std::find(playerLayout.begin(), playerLayout.end(), pos);
+    if (!add) {
+      if (it != playerLayout.end())
+        playerLayout.erase(it);
+    } else {
+      if (it == playerLayout.end())
+        playerLayout.insert(pos);
+    }
+  }
+}
 
 bool Board::canPutChip(int ind) { return availableMoves.contains(ind); }
 
 void Board::moveMade(int ind) {
   availableMoves.erase(availableMoves.find(ind));
+  playerLayout.insert(ind);
 }
 
-void Board::updateAvailableMoves() {
+void Board::updateAvailableMoves(Chip user, Chip comp,
+                                 QMap<int, Direction> &avm, QSet<int> pl) {
   int ind = 0;
-  while ((!availableMoves.empty()) && (ind != availableMoves.size())) {
-    if (!areThereChips((availableMoves.begin() + ind).key(),
-                       (availableMoves.begin() + ind).value(), userChip,
-                       computerChip)) {
-      availableMoves.erase(availableMoves.begin() + ind);
+  while ((!avm.empty()) && (ind != avm.size())) {
+    if (!areThereChips((avm.begin() + ind).key(), (avm.begin() + ind).value(),
+                       user, comp)) {
+      avm.erase(avm.begin() + ind);
     } else
       ++ind;
+  }
+
+  for (auto pos : pl) {
+    addPossibleMoves(pos, user, comp, avm);
   }
 }
 
 Chip Board::getUserChip() { return userChip; }
+
+void Board::addPossibleMoves(int pos, Chip user, Chip comp,
+                             QMap<int, Direction> &avm) {
+  int pp = availablePos(pos, Direction::Down, user, comp);
+  if (pp != -1)
+    avm.insert(pp, Direction::Up);
+  pp = availablePos(pos, Direction::Left, user, comp);
+  if (pp != -1)
+    avm.insert(pp, Direction::Right);
+  pp = availablePos(pos, Direction::Right, user, comp);
+  if (pp != -1)
+    avm.insert(pp, Direction::Left);
+  pp = availablePos(pos, Direction::Up, user, comp);
+  if (pp != -1)
+    avm.insert(pp, Direction::Down);
+  pp = availablePos(pos, Direction::LeftDown, user, comp);
+  if (pp != -1)
+    avm.insert(pp, Direction::RightUp);
+  pp = availablePos(pos, Direction::LeftUp, user, comp);
+  if (pp != -1)
+    avm.insert(pp, Direction::RightDown);
+  pp = availablePos(pos, Direction::RightDown, user, comp);
+  if (pp != -1)
+    avm.insert(pp, Direction::LeftUp);
+  pp = availablePos(pos, Direction::RightUp, user, comp);
+  if (pp != -1)
+    avm.insert(pp, Direction::LeftDown);
+}
+
+int Board::availablePos(int ind, Direction dir, Chip user, Chip comp) {
+  int x = ind % 8;
+  int y = ind / 8;
+  bool changed = true;
+
+  switch (static_cast<int>(dir)) {
+  case 0: // left
+    --x;
+    while (x >= 0) {
+      if (getChip(x, y) == comp)
+        changed = !changed;
+      else if (getChip(x, y) == Chip::Empty)
+        if (!changed)
+          return y * 8 + x;
+        else
+          break;
+      --x;
+    }
+    break;
+  case 1: // right
+    ++x;
+    while (x < 8) {
+      if (getChip(x, y) == comp)
+        changed = !changed;
+      else if (getChip(x, y) == Chip::Empty)
+        if (!changed)
+          return y * 8 + x;
+        else
+          break;
+      ++x;
+    }
+    break;
+  case 2: // up
+    --y;
+    while (y >= 0) {
+      if (getChip(x, y) == comp)
+        changed = !changed;
+      else if (getChip(x, y) == Chip::Empty)
+        if (!changed)
+          return y * 8 + x;
+        else
+          break;
+      --y;
+    }
+    break;
+  case 3: // down
+    ++y;
+    while (y < 8) {
+      if (getChip(x, y) == comp)
+        changed = !changed;
+      else if (getChip(x, y) == Chip::Empty)
+        if (!changed)
+          return y * 8 + x;
+        else
+          break;
+      ++y;
+    }
+    break;
+
+  case 4: // left up
+    --x;
+    --y;
+    while ((y >= 0) && (x >= 0)) {
+      if (getChip(x, y) == comp)
+        changed = !changed;
+      else if (getChip(x, y) == Chip::Empty)
+        if (!changed)
+          return y * 8 + x;
+        else
+          break;
+      --x;
+      --y;
+    }
+    break;
+
+  case 5: // left down
+    --x;
+    ++y;
+    while ((y < 8) && (x >= 0)) {
+      if (getChip(x, y) == comp)
+        changed = !changed;
+      else if (getChip(x, y) == Chip::Empty)
+        if (!changed)
+          return y * 8 + x;
+        else
+          break;
+      --x;
+      ++y;
+    }
+    break;
+
+  case 6: // right up
+    ++x;
+    --y;
+    while ((y >= 0) && (x < 8)) {
+      if (getChip(x, y) == comp)
+        changed = !changed;
+      else if (getChip(x, y) == Chip::Empty)
+        if (!changed)
+          return y * 8 + x;
+        else
+          break;
+      ++x;
+      --y;
+    }
+    break;
+
+  case 7: // right down
+    ++x;
+    ++y;
+    while ((y < 8) && (x < 8)) {
+      if (getChip(x, y) == comp)
+        changed = !changed;
+      else if (getChip(x, y) == Chip::Empty)
+        if (!changed)
+          return y * 8 + x;
+        else
+          break;
+      ++x;
+      ++y;
+    }
+    break;
+  }
+
+  return -1;
+}
 
 bool Board::final() const { return true; }
 
@@ -113,74 +306,78 @@ Board &Board::operator=(Board &&other) {
   return *this;
 }
 
-void Board::updateLayout(int x, int y) {
-  // QSet<Direction> res;
+QList<int> Board::updateLayout(int x, int y, Chip user) {
+  QList<int> res;
 
   // left
   int xx = x;
   while (xx >= 0) {
-    if (getChip(xx - 1, y) == userChip)
+    if (getChip(xx - 1, y) == user)
       break;
     --xx;
   }
   if (xx >= 0) {
-    // res.insert(Direction::Left);
-    for (int i = xx; i < x; ++i)
-      putChip(i, y, userChip);
+    for (int i = xx; i < x; ++i) {
+      putChip(i, y, user);
+      res.push_back(y * 8 + i);
+    }
   }
 
   // right
   xx = x;
   while (xx < 8) {
-    if (getChip(xx + 1, y) == userChip)
+    if (getChip(xx + 1, y) == user)
       break;
     ++xx;
   }
   if (xx < 8) {
-    // res.insert(Direction::Right);
-    for (int i = x + 1; i <= xx; ++i)
-      putChip(i, y, userChip);
+    for (int i = x + 1; i <= xx; ++i) {
+      putChip(i, y, user);
+      res.push_back(y * 8 + i);
+    }
   }
 
   // up
   int yy = y;
   while (yy >= 0) {
-    if (getChip(x, yy - 1) == userChip)
+    if (getChip(x, yy - 1) == user)
       break;
     --yy;
   }
   if (yy >= 0) {
-    // res.insert(Direction::Up);
-    for (int j = yy; j < y; ++j)
-      putChip(x, j, userChip);
+    for (int j = yy; j < y; ++j) {
+      putChip(x, j, user);
+      res.push_back(j * 8 + x);
+    }
   }
 
   // down
   yy = y;
   while (yy < 8) {
-    if (getChip(x, yy + 1) == userChip)
+    if (getChip(x, yy + 1) == user)
       break;
     ++yy;
   }
   if (yy < 8) {
-    // res.insert(Direction::Down);
-    for (int j = y + 1; j <= yy; ++j)
-      putChip(x, j, userChip);
+    for (int j = y + 1; j <= yy; ++j) {
+      putChip(x, j, user);
+      res.push_back(j * 8 + x);
+    }
   }
 
   // left up
   xx = x;
   yy = y;
   while ((xx >= 0) && (yy >= 0)) {
-    if (getChip(xx - 1, yy - 1) == userChip)
+    if (getChip(xx - 1, yy - 1) == user)
       break;
     --xx;
     --yy;
   }
   if ((xx >= 0) && (yy >= 0)) {
-    // res.insert(Direction::LeftUp);
     while ((xx != x) && (yy != y)) {
-      putChip(xx, yy, userChip);
+      putChip(xx, yy, user);
+      res.push_back(yy * 8 + xx);
       ++xx;
       ++yy;
     }
@@ -190,15 +387,15 @@ void Board::updateLayout(int x, int y) {
   xx = x;
   yy = y;
   while ((xx >= 0) && (yy < 8)) {
-    if (getChip(xx - 1, yy + 1) == userChip)
+    if (getChip(xx - 1, yy + 1) == user)
       break;
     --xx;
     ++yy;
   }
   if ((xx >= 0) && (yy < 8)) {
-    // res.insert(Direction::LeftDown);
     while ((xx != x) && (yy != y)) {
-      putChip(xx, yy, userChip);
+      putChip(xx, yy, user);
+      res.push_back(yy * 8 + xx);
       ++xx;
       --yy;
     }
@@ -208,15 +405,15 @@ void Board::updateLayout(int x, int y) {
   xx = x;
   yy = y;
   while ((xx < 8) && (yy >= 0)) {
-    if (getChip(xx + 1, yy - 1) == userChip)
+    if (getChip(xx + 1, yy - 1) == user)
       break;
     ++xx;
     --yy;
   }
   if ((xx < 8) && (yy >= 0)) {
-    // res.insert(Direction::RightUp);
     while ((xx != x) && (yy != y)) {
-      putChip(xx, yy, userChip);
+      putChip(xx, yy, user);
+      res.push_back(yy * 8 + xx);
       --xx;
       ++yy;
     }
@@ -226,21 +423,21 @@ void Board::updateLayout(int x, int y) {
   xx = x;
   yy = y;
   while ((xx < 8) && (yy < 8)) {
-    if (getChip(xx + 1, yy + 1) == userChip)
+    if (getChip(xx + 1, yy + 1) == user)
       break;
     ++xx;
     ++yy;
   }
   if ((xx < 8) && (yy < 8)) {
-    // res.insert(Direction::RightDown);
     while ((xx != x) && (yy != y)) {
-      putChip(xx, yy, userChip);
+      putChip(xx, yy, user);
+      res.push_back(yy * 8 + xx);
       --xx;
       --yy;
     }
   }
 
-  // return res;
+  return res;
 }
 
 void Board::generateHash() {
@@ -379,5 +576,5 @@ Board::Board() {
   putChip(3, 3, Chip::White);
   putChip(4, 4, Chip::White);
   generateHash();
-  initializeAvailableMoves(userChip, availableMoves);
+  initializeAvailableMoves(getUserChip(), availableMoves, playerLayout);
 }

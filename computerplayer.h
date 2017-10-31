@@ -9,6 +9,10 @@ public:
   void initChips(Chip user, Chip comp);
   bool computerCanPutChip(int ind);
   void updateAvailableMoves();
+  int makeMove();
+  QList<int> updateLayout(int x, int y);
+  void updatePlayerLayout(const QList<int> &takenChips, bool add = true);
+  int getAvMLength();
 
 public slots:
   void setDifficulty(int val);
@@ -20,6 +24,7 @@ private:
   Chip userChip = Chip::Black;
   int difficulty = 1;
   QMap<int, Direction> availableMoves;
+  QSet<int> playerLayout;
 
   int canPutChipRight(int ind);
   int canPutChipLeft(int ind);

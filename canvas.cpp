@@ -78,8 +78,20 @@ void Canvas::mousePressEvent(QMouseEvent *e) {
     return;
   b.putChip(x, y, userChip);
   b.moveMade(y * 8 + x);
-  b.updateLayout(x, y);
+  QList<int> takenChips = b.updateLayout(x, y, b.getUserChip());
+  b.updatePlayerLayout(takenChips, true);
+  cp.updatePlayerLayout(takenChips, false);
   cp.updateAvailableMoves();
-  b.updateAvailableMoves();
+  b.updAvM();
+  int ind = cp.makeMove();
+  takenChips = cp.updateLayout(ind % 8, ind / 8);
+  b.updatePlayerLayout(takenChips, false);
+  repaint();
+  cp.updatePlayerLayout(takenChips, true);
+  repaint();
+  cp.updateAvailableMoves();
+  repaint();
+  b.updAvM();
+
   repaint();
 }

@@ -4,6 +4,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent), ui(new Ui::MainWindow) {
   ui->setupUi(this);
+  srand(time(0));
   connect(ui->blackChips, &QRadioButton::clicked,
           [&]() { ui->frame->setChips(Chip::Black, Chip::White); });
   connect(ui->whiteChips, &QRadioButton::clicked,
