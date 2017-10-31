@@ -35,7 +35,8 @@ HEADERS += \
     board.h \
     canvas.h \
     chips.h \
-    computerplayer.h
+    computerplayer.h \
+    direction.h
 
 FORMS += \
         mainwindow.ui

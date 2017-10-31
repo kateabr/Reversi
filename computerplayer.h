@@ -2,25 +2,24 @@
 #define COMPUTERPLAYER_H
 
 #include "board.h"
-#include <QSet>
 
 class ComputerPlayer {
 public:
   ComputerPlayer(Board &bb);
   void initChips(Chip user, Chip comp);
   bool computerCanPutChip(int ind);
-  void updateAvailableMoves(int newChip);
+  void updateAvailableMoves();
 
 public slots:
   void setDifficulty(int val);
   void initializeAvailableMoves();
 
 private:
-  Board b; // copy of original board
+  Board *b; // copy of original board
   Chip computerChip = Chip::White;
   Chip userChip = Chip::Black;
   int difficulty = 1;
-  QSet<int> availableMoves;
+  QMap<int, Direction> availableMoves;
 
   int canPutChipRight(int ind);
   int canPutChipLeft(int ind);

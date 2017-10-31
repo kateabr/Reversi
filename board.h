@@ -2,7 +2,9 @@
 #define BOARD_H
 
 #include "chips.h"
+#include "direction.h"
 #include <QDebug>
+#include <QMap>
 #include <algorithm>
 #include <chrono>
 #include <functional>
@@ -27,10 +29,11 @@ public:
   void print() const;
   void clearLayout();
   bool layoutIsEmpty();
-  QList<QPair<int, int>> getPossibleMoves();
   void initChips(Chip user, Chip comp);
   bool canPutChip(int ind);
   void moveMade(int ind);
+  void updateAvailableMoves();
+  Chip getUserChip();
 
   Board();
   ~Board();
@@ -39,9 +42,10 @@ public:
   Board &operator=(const Board &other);
   Board &operator=(Board &&other);
   void updateLayout(int x, int y);
+  bool areThereChips(int ind, Direction dir, Chip user, Chip comp);
 
-public slots:
-  void initializeAvailableMoves();
+  void initializeAvailableMoves(Chip user, QMap<int, Direction> &avm);
+  void initAvM();
 
 private:
   Chip *layout;
@@ -49,7 +53,7 @@ private:
   Chip computerChip = Chip::White;
   size_t boardHash;
   void generateHash();
-  QSet<int> availableMoves;
+  QMap<int, Direction> availableMoves;
 };
 
 #endif // BOARD_H

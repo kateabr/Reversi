@@ -3,6 +3,8 @@
 
 Canvas::Canvas(QWidget *parent) : QWidget(parent), cp(b) {}
 
+const Board &Canvas::getBoard() { return b; }
+
 void Canvas::setChips(Chip user, Chip comp) {
   b.initChips(user, comp);
   cp.initChips(user, comp);
@@ -14,7 +16,8 @@ void Canvas::setStartGame(bool s) {
   gameStarted = s;
   if (!s) {
     b.clearLayout();
-    b.initializeAvailableMoves();
+
+    b.initAvM();
     cp.initializeAvailableMoves();
   }
 }
@@ -75,7 +78,8 @@ void Canvas::mousePressEvent(QMouseEvent *e) {
     return;
   b.putChip(x, y, userChip);
   b.moveMade(y * 8 + x);
-  cp.updateAvailableMoves(y * 8 + x);
   b.updateLayout(x, y);
+  cp.updateAvailableMoves();
+  b.updateAvailableMoves();
   repaint();
 }

@@ -9,6 +9,10 @@ class Canvas : public QWidget {
   Q_OBJECT
 public:
   explicit Canvas(QWidget *parent = nullptr);
+  const Board &getBoard();
+
+signals:
+  void initAvailMoves();
 
 public slots:
   void setChips(Chip user, Chip comp);
