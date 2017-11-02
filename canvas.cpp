@@ -5,6 +5,28 @@ Canvas::Canvas(QWidget *parent) : QWidget(parent), cp(b) {}
 
 const Board &Canvas::getBoard() { return b; }
 
+void Canvas::computerPlayerMakeMove() {
+  QPair<int, QList<Direction>> computerMove = cp.makeMove();
+  QList<int> takenChips = cp.updateLayout(computerMove);
+  b.updatePlayerLayout(takenChips, false);
+  cp.updatePlayerLayout(takenChips, true);
+  cp.updateAvailableMoves();
+  b.updAvM();
+}
+
+void Canvas::userMakeMove(int x, int y) {
+  QPair<int, QList<Direction>> userMove = b.putChip(x, y, userChip);
+  QList<int> takenChips = b.updateLayout(userMove, b.getUserChip());
+  cp.updatePlayerLayout(takenChips, false);
+  cp.updateAvailableMoves();
+  b.updAvM();
+}
+
+void Canvas::clearLayout() {
+  b.clearLayout();
+  b.initAvM();
+}
+
 void Canvas::setChips(Chip user, Chip comp) {
   b.initChips(user, comp);
   cp.initChips(user, comp);
@@ -20,6 +42,8 @@ void Canvas::setStartGame(bool s) {
     b.initAvM();
     cp.initializeAvailableMoves();
   }
+  if (userChip == Chip::White)
+    computerPlayerMakeMove();
 }
 
 void Canvas::setDifficulty(int val) { cp.setDifficulty(val); }
@@ -76,22 +100,8 @@ void Canvas::mousePressEvent(QMouseEvent *e) {
   size_t y = curPos.y() / squareWidth;
   if ((b.getChip(x, y) != Chip::Empty) || (!b.canPutChip(y * 8 + x)))
     return;
-  b.putChip(x, y, userChip);
-  b.moveMade(y * 8 + x);
-  QList<int> takenChips = b.updateLayout(x, y, b.getUserChip());
-  b.updatePlayerLayout(takenChips, true);
-  cp.updatePlayerLayout(takenChips, false);
-  cp.updateAvailableMoves();
-  b.updAvM();
-  int ind = cp.makeMove();
-  takenChips = cp.updateLayout(ind % 8, ind / 8);
-  b.updatePlayerLayout(takenChips, false);
+  userMakeMove(x, y);
   repaint();
-  cp.updatePlayerLayout(takenChips, true);
-  repaint();
-  cp.updateAvailableMoves();
-  repaint();
-  b.updAvM();
-
+  computerPlayerMakeMove();
   repaint();
 }

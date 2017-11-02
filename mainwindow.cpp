@@ -5,10 +5,14 @@ MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent), ui(new Ui::MainWindow) {
   ui->setupUi(this);
   srand(time(0));
-  connect(ui->blackChips, &QRadioButton::clicked,
-          [&]() { ui->frame->setChips(Chip::Black, Chip::White); });
-  connect(ui->whiteChips, &QRadioButton::clicked,
-          [&]() { ui->frame->setChips(Chip::White, Chip::Black); });
+  connect(ui->blackChips, &QRadioButton::clicked, [&]() {
+    ui->frame->setChips(Chip::Black, Chip::White);
+    ui->frame->clearLayout();
+  });
+  connect(ui->whiteChips, &QRadioButton::clicked, [&]() {
+    ui->frame->setChips(Chip::White, Chip::Black);
+    ui->frame->clearLayout();
+  });
   connect(ui->difficulty, &QSlider::valueChanged, [&](int val) {
     ui->groupBox_2->setTitle("Difficulty: " + QString::number(val));
   });

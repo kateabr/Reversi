@@ -24,7 +24,7 @@ public:
   const Chip *getLayout() const;
   Chip getChip(int i, int j) const;
   Chip getChip(int ind) const;
-  void putChip(int i, int j, Chip ch, bool push = true);
+  QPair<int, QList<Direction>> putChip(int i, int j, Chip ch, bool push = true);
   void putChip(int ind, Chip ch, bool push = true);
   size_t getHash() const;
   void print() const;
@@ -32,12 +32,12 @@ public:
   bool layoutIsEmpty();
   void initChips(Chip user, Chip comp);
   bool canPutChip(int ind);
-  void moveMade(int ind);
-  void updateAvailableMoves(Chip user, Chip comp, QMap<int, Direction> &avm,
-                            QSet<int> pl);
+  void moveMade(int ind, bool push = true);
+  void updateAvailableMoves(Chip user, Chip comp,
+                            QMap<int, QList<Direction>> &avm, QSet<int> pl);
   Chip getUserChip();
   void addPossibleMoves(int pos, Chip user, Chip comp,
-                        QMap<int, Direction> &avm);
+                        QMap<int, QList<Direction>> &avm);
   int availablePos(int ind, Direction dir, Chip user, Chip comp);
 
   Board();
@@ -46,10 +46,11 @@ public:
   Board(Board &&other);
   Board &operator=(const Board &other);
   Board &operator=(Board &&other);
-  QList<int> updateLayout(int x, int y, Chip user);
+  QList<int> updateLayout(QPair<int, QList<Direction>> move, Chip user);
   bool areThereChips(int ind, Direction dir, Chip user, Chip comp);
+  QList<int> getChipsToUpdateLayout(int x, int y, Chip user);
 
-  void initializeAvailableMoves(Chip user, QMap<int, Direction> &avm,
+  void initializeAvailableMoves(Chip user, QMap<int, QList<Direction>> &avm,
                                 QSet<int> &pl);
   void updatePlayerLayout(const QList<int> &takenChips, bool add = true);
   void initAvM();
@@ -62,7 +63,7 @@ private:
   Chip computerChip = Chip::White;
   size_t boardHash;
   void generateHash();
-  QMap<int, Direction> availableMoves;
+  QMap<int, QList<Direction>> availableMoves;
 };
 
 #endif // BOARD_H

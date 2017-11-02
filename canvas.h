@@ -10,6 +10,8 @@ class Canvas : public QWidget {
 public:
   explicit Canvas(QWidget *parent = nullptr);
   const Board &getBoard();
+  void computerPlayerMakeMove();
+  void userMakeMove(int x, int y);
 
 signals:
   void initAvailMoves();
@@ -18,6 +20,7 @@ public slots:
   void setChips(Chip user, Chip comp);
   void setStartGame(bool s);
   void setDifficulty(int val);
+  void clearLayout();
 
 protected:
   void paintEvent(QPaintEvent *);
