@@ -20,27 +20,6 @@ void ComputerPlayer::updateAvailableMoves() {
   b->updateAvailableMoves(computerChip, userChip, availableMoves, playerLayout);
 }
 
-QPair<int, QList<Direction>> ComputerPlayer::makeMove() {
-  QPair<int, QList<Direction>> res;
-  if (availableMoves.size() > 1) {
-    int rnd = rand() % availableMoves.size();
-    rnd = (availableMoves.begin() + rnd).key();
-    b->putChip(rnd, computerChip, false);
-    res.first = rnd;
-    res.second = availableMoves[rnd];
-    playerLayout.insert(rnd);
-    moveMade(rnd);
-    return res;
-  }
-  int rnd = availableMoves.begin().key();
-  b->putChip(rnd, computerChip, false);
-  res.first = rnd;
-  res.second = availableMoves[rnd];
-  playerLayout.insert(rnd);
-  moveMade(rnd);
-  return res;
-}
-
 QList<int> ComputerPlayer::updateLayout(QPair<int, QList<Direction>> move) {
   playerLayout.insert(move.first);
   return b->updateLayout(move, computerChip);

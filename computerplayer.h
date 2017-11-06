@@ -6,7 +6,6 @@
 class ComputerPlayer {
 public:
   ComputerPlayer(Board &bb);
-  void initChips(Chip user, Chip comp);
   bool computerCanPutChip(int ind);
   void updateAvailableMoves();
   QPair<int, QList<Direction>> makeMove();
@@ -17,6 +16,7 @@ public:
 public slots:
   void setDifficulty(int val);
   void initializeAvailableMoves();
+  void initChips(Chip user, Chip comp);
 
 private:
   Board *b; // copy of original board

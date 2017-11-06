@@ -18,6 +18,7 @@ public slots:
   void setControlsEnabled(bool val);
 
 private:
+  void gameFinished();
   Ui::MainWindow *ui;
 };
 

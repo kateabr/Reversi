@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2017-10-30T16:07:35
+# Project created by QtCreator 2017-11-02T21:52:54
 #
 #-------------------------------------------------
 
@@ -26,17 +26,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    board.cpp \
     canvas.cpp \
-    computerplayer.cpp
+    board.cpp \
+    availablemove.cpp \
+    current.cpp
 
 HEADERS += \
         mainwindow.h \
-    board.h \
     canvas.h \
+    direction.h \
+    board.h \
     chips.h \
-    computerplayer.h \
-    direction.h
+    availablemove.h \
+    current.h
 
 FORMS += \
         mainwindow.ui
