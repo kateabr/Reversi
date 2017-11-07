@@ -8,14 +8,12 @@ Canvas::Canvas(QWidget *parent) : QWidget(parent) /*, cp(b)*/ {
 const Board &Canvas::getBoard() { return b; }
 
 void Canvas::computerPlayerMakeMove() {
-  AvailableMove move = b.computerMakeMove();
+  AvailableMove move = cp.makeMove(b);
+  b.putChip(move.getInd(), Current::Computer);
   b.moveMade(move, Current::Computer);
 }
 
-void Canvas::userMakeMove(int x, int y) {
-  AvailableMove move = b.putChip(x, y, Current::User);
-  b.moveMade(move, Current::User);
-}
+void Canvas::userMakeMove(int x, int y) { b.makeMove(x, y); }
 
 int Canvas::playerScore() { return b.playerScore(); }
 
@@ -23,25 +21,23 @@ int Canvas::computerScore() { return b.computerScore(); }
 
 void Canvas::clearLayout() { b.initializeLayouts(); }
 
-void Canvas::setChips(Chip user, Chip comp) {
+void Canvas::setChips(Chip user, bool initLayout) {
   if (b.getUserChip() != user) {
     b.changeChips();
     repaint();
   }
+  if (initLayout)
+    b.initializeLayouts();
 }
 
 void Canvas::setStartGame(bool s) {
   gameStarted = s;
-  if (!s) {
-    b.initializeLayouts();
-  }
   if (userChip == Chip::White) {
-    computerPlayerMakeMove();
+    cp.makeRandomMove(b);
   }
 }
 
-void Canvas::setDifficulty(int val) { /*cp.setDifficulty(val);*/
-}
+void Canvas::setDifficulty(int val) { cp.setDifficulty(val); }
 
 void Canvas::paintEvent(QPaintEvent *) {
   QPainter p(this);
@@ -97,13 +93,13 @@ void Canvas::mousePressEvent(QMouseEvent *e) {
     return;
   userMakeMove(x, y);
   repaint();
-  if (b.final()) {
+  if (b.final(Current::Computer)) {
     emit gameFinished();
     return;
   }
   computerPlayerMakeMove();
   repaint();
-  if (b.final()) {
+  if (b.final(Current::User)) {
     emit gameFinished();
     return;
   }

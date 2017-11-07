@@ -44,3 +44,7 @@ void AvailableMove::eraseDirection(int ind) {
 }
 
 void AvailableMove::setInd(int ind) { moveIndex = ind; }
+
+int AvailableMove::getIndX() const { return moveIndex % 8; }
+
+int AvailableMove::getIndY() const { return moveIndex / 8; }

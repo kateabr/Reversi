@@ -2,7 +2,7 @@
 #define CANVAS_H
 
 #include "board.h"
-#include "computerplayer.h"
+#include "computeropponent.h"
 #include <QtWidgets>
 
 class Canvas : public QWidget {
@@ -14,11 +14,11 @@ public:
   void userMakeMove(int x, int y);
   int playerScore();
   int computerScore();
+  void setDifficulty(int val);
 
 public slots:
-  void setChips(Chip user, Chip comp);
+  void setChips(Chip user, bool initLayout);
   void setStartGame(bool s);
-  void setDifficulty(int val);
   void clearLayout();
 
 signals:
@@ -30,7 +30,7 @@ protected:
 
 private:
   Board b;
-  // ComputerPlayer cp;
+  ComputerOpponent cp;
   Chip userChip = Chip::Black;
   bool gameStarted = false;
 };

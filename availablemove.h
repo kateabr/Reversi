@@ -21,6 +21,8 @@ public:
   int size();
   void eraseDirection(int ind);
   void setInd(int ind);
+  int getIndX() const;
+  int getIndY() const;
 
 private:
   int moveIndex;

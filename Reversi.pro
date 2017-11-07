@@ -29,7 +29,9 @@ SOURCES += \
     canvas.cpp \
     board.cpp \
     availablemove.cpp \
-    current.cpp
+    current.cpp \
+    squareweights.cpp \
+    computeropponent.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -38,7 +40,9 @@ HEADERS += \
     board.h \
     chips.h \
     availablemove.h \
-    current.h
+    current.h \
+    squareweights.h \
+    computeropponent.h
 
 FORMS += \
         mainwindow.ui

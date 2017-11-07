@@ -1,11 +1,5 @@
 #include "board.h"
 
-Board Board::MakeBoard() {
-  Board res;
-  res.generateHash();
-  return res;
-}
-
 Chip Board::getChip(int ind) const {
   if (playerLayout.contains(ind))
     return playerChip;
@@ -15,7 +9,7 @@ Chip Board::getChip(int ind) const {
     return Chip::Empty;
 }
 
-Chip Board::getChip(int i, int j) const { getChip(j * 8 + i); }
+Chip Board::getChip(int i, int j) const { return getChip(j * 8 + i); }
 
 AvailableMove Board::putChip(int ind, Current cur) {
   AvailableMove madeMove;
@@ -31,8 +25,8 @@ AvailableMove Board::putChip(int ind, Current cur) {
       madeMove = playerAvailableMoves[pos];
       playerLayout.insert(ind);
     } else
-      qDebug() << "putChip() error: such move can't be made";
-    break;
+      // qDebug() << "putChip() error: such move can't be made";
+      break;
   }
   case Current::Computer: {
     int pos = -1;
@@ -45,8 +39,8 @@ AvailableMove Board::putChip(int ind, Current cur) {
       madeMove = computerAvailableMoves[pos];
       computerLayout.insert(ind);
     } else
-      qDebug() << "putChip() error: such move can't be made";
-    break;
+      // qDebug() << "putChip() error: such move can't be made";
+      break;
   }
   }
   return madeMove;
@@ -55,15 +49,6 @@ AvailableMove Board::putChip(int ind, Current cur) {
 AvailableMove Board::putChip(int i, int j, Current cur) {
   return putChip(j * 8 + i, cur);
 }
-
-size_t Board::getHash() const { return boardHash; }
-
-/*void Board::print() const {
-  QDebug deb = qDebug();
-  for (int i = 0; i < 64; ++i)
-    deb << static_cast<int>(layout[i]) << " ";
-  deb << endl;
-}*/
 
 void Board::initializeLayouts() {
   playerAvailableMoves.clear();
@@ -99,31 +84,6 @@ void Board::changeChips() {
   std::swap(playerAvailableMoves, computerAvailableMoves);
 }
 
-void Board::initializeAvailableMoves(Chip user,
-                                     QMap<int, QList<Direction>> &avm,
-                                     QSet<int> &pl) {}
-
-/*void Board::initAvM() {
-  initializeAvailableMoves(playerChip, availableMoves, playerLayout);
-}*/
-
-/*void Board::updAvM() {
-  updateAvailableMoves(playerChip, computerChip, availableMoves, playerLayout);
-}*/
-
-void Board::updatePlayerLayout(const QList<int> &takenChips, bool add) {
-  for (int pos : takenChips) {
-    auto it = std::find(playerLayout.begin(), playerLayout.end(), pos);
-    if (!add) {
-      if (it != playerLayout.end())
-        playerLayout.erase(it);
-    } else {
-      if (it == playerLayout.end())
-        playerLayout.insert(pos);
-    }
-  }
-}
-
 bool Board::canPutChip(int ind, Current cur) {
   switch (cur) {
   case Current::User:
@@ -152,6 +112,19 @@ void Board::moveMade(AvailableMove &madeMove, Current cur) {
 int Board::playerScore() { return playerLayout.size(); }
 
 int Board::computerScore() { return computerLayout.size(); }
+
+QList<AvailableMove> Board::getComputerAvailableMoves() const {
+  return computerAvailableMoves;
+}
+
+QList<AvailableMove> Board::getPlayerAvailableMoves() const {
+  return playerAvailableMoves;
+}
+
+void Board::makeMove(int x, int y) {
+  AvailableMove move = putChip(x, y, Current::User);
+  moveMade(move, Current::User);
+}
 
 void Board::updateAvailableMoves(Current cur) {
   int ind = 0;
@@ -294,7 +267,7 @@ int Board::availablePos(int ind, Direction dir, Chip enemyChip) {
       else {
         if (getChip(x, y) == Chip::Empty) {
           if (!changed) {
-            qDebug() << "left square for " << ind << ": " << (y * 8 + x);
+            // qDebug() << "left square for " << ind << ": " << (y * 8 + x);
             return y * 8 + x;
           }
         }
@@ -311,7 +284,7 @@ int Board::availablePos(int ind, Direction dir, Chip enemyChip) {
       else {
         if (getChip(x, y) == Chip::Empty) {
           if (!changed) {
-            qDebug() << "right square for " << ind << ": " << (y * 8 + x);
+            // qDebug() << "right square for " << ind << ": " << (y * 8 + x);
             return y * 8 + x;
           }
         }
@@ -328,7 +301,7 @@ int Board::availablePos(int ind, Direction dir, Chip enemyChip) {
       else {
         if (getChip(x, y) == Chip::Empty) {
           if (!changed) {
-            qDebug() << "up square for " << ind << ": " << (y * 8 + x);
+            // qDebug() << "up square for " << ind << ": " << (y * 8 + x);
             return y * 8 + x;
           }
         }
@@ -345,7 +318,7 @@ int Board::availablePos(int ind, Direction dir, Chip enemyChip) {
       else {
         if (getChip(x, y) == Chip::Empty) {
           if (!changed) {
-            qDebug() << "down square for " << ind << ": " << (y * 8 + x);
+            // qDebug() << "down square for " << ind << ": " << (y * 8 + x);
             return y * 8 + x;
           }
         }
@@ -363,7 +336,7 @@ int Board::availablePos(int ind, Direction dir, Chip enemyChip) {
       else {
         if (getChip(x, y) == Chip::Empty) {
           if (!changed) {
-            qDebug() << "left up square for " << ind << ": " << (y * 8 + x);
+            // qDebug() << "left up square for " << ind << ": " << (y * 8 + x);
             return y * 8 + x;
           }
         }
@@ -382,7 +355,8 @@ int Board::availablePos(int ind, Direction dir, Chip enemyChip) {
       else {
         if (getChip(x, y) == Chip::Empty) {
           if (!changed) {
-            qDebug() << "left down square for " << ind << ": " << (y * 8 + x);
+            // qDebug() << "left down square for " << ind << ": " << (y * 8 +
+            // x);
             return y * 8 + x;
           }
         }
@@ -401,7 +375,7 @@ int Board::availablePos(int ind, Direction dir, Chip enemyChip) {
       else {
         if (getChip(x, y) == Chip::Empty) {
           if (!changed) {
-            qDebug() << "right up square for " << ind << ": " << (y * 8 + x);
+            // qDebug() << "right up square for " << ind << ": " << (y * 8 + x);
             return y * 8 + x;
           }
         }
@@ -420,7 +394,8 @@ int Board::availablePos(int ind, Direction dir, Chip enemyChip) {
       else {
         if (getChip(x, y) == Chip::Empty) {
           if (!changed) {
-            qDebug() << "right down square for " << ind << ": " << (y * 8 + x);
+            // qDebug() << "right down square for " << ind << ": " << (y * 8 +
+            // x);
             return y * 8 + x;
           }
         }
@@ -440,18 +415,170 @@ AvailableMove Board::computerMakeMove() {
   return putChip(computerAvailableMoves[rnd].getInd(), Current::Computer);
 }
 
-bool Board::final() {
-  return (playerAvailableMoves.size() == 0) ||
-         (computerAvailableMoves.size() == 0);
+bool Board::final(Current cur) const {
+  switch (cur) {
+  case Current::User:
+    return playerAvailableMoves.size() == 0;
+  case Current::Computer:
+    return computerAvailableMoves.size() == 0;
+  }
 }
 
-int Board::heuristic() const { return 0; }
+double Board::heuristic() const {
+  int my_tiles = 0;
+  int opp_tiles = 0;
+  int X1[] = {-1, -1, 0, 1, 1, 1, 0, -1};
+  int Y1[] = {0, 1, 1, 1, 0, -1, -1, -1};
+  int x = 0;
+  int y = 0;
+  int my_front_tiles = 0;
+  int opp_front_tiles = 0;
+  double p = 0;
+  double f = 0;
+  double c = 0;
+  double m = 0;
+  double l = 0;
+  double d = 0;
+
+  // Piece difference, frontier disks and disk squares
+  for (int i = 0; i < 8; i++)
+    for (int j = 0; j < 8; j++) {
+      if (getChip(i, j) == playerChip) {
+        d += sw.getWeight(i, j);
+        my_tiles++;
+      } else if (getChip(i, j) == computerChip) {
+        d -= sw.getWeight(i, j);
+        opp_tiles++;
+      }
+      if (getChip(i, j) != Chip::Empty) {
+        for (int k = 0; k < 8; k++) {
+          x = i + X1[k];
+          y = j + Y1[k];
+          if (x >= 0 && x < 8 && y >= 0 && y < 8 &&
+              getChip(x, y) == Chip::Empty) {
+            if (playerLayout.contains(j * 8 + i))
+              my_front_tiles++;
+            else
+              opp_front_tiles++;
+            break;
+          }
+        }
+      }
+    }
+  if (my_tiles > opp_tiles)
+    p = (100.0 * my_tiles) / (my_tiles + opp_tiles);
+  else if (my_tiles < opp_tiles)
+    p = -(100.0 * opp_tiles) / (my_tiles + opp_tiles);
+  else
+    p = 0;
+
+  if (my_front_tiles > opp_front_tiles)
+    f = -(100.0 * my_front_tiles) / (my_front_tiles + opp_front_tiles);
+  else if (my_front_tiles < opp_front_tiles)
+    f = (100.0 * opp_front_tiles) / (my_front_tiles + opp_front_tiles);
+  else
+    f = 0;
+
+  // Corner occupancy
+  my_tiles = opp_tiles = 0;
+  if (getChip(0, 0) == playerChip)
+    my_tiles++;
+  else if (getChip(0, 0) == computerChip)
+    opp_tiles++;
+  if (getChip(0, 7) == playerChip)
+    my_tiles++;
+  else if (getChip(0, 7) == computerChip)
+    opp_tiles++;
+  if (getChip(7, 0) == playerChip)
+    my_tiles++;
+  else if (getChip(7, 0) == computerChip)
+    opp_tiles++;
+  if (getChip(7, 7) == playerChip)
+    my_tiles++;
+  else if (getChip(7, 7) == computerChip)
+    opp_tiles++;
+  c = 25 * (my_tiles - opp_tiles);
+
+  // Corner closeness
+  my_tiles = opp_tiles = 0;
+  if (getChip(0, 0) == Chip::Empty) {
+    if (getChip(0, 1) == playerChip)
+      my_tiles++;
+    else if (getChip(0, 1) == computerChip)
+      opp_tiles++;
+    if (getChip(1, 1) == playerChip)
+      my_tiles++;
+    else if (getChip(1, 1) == computerChip)
+      opp_tiles++;
+    if (getChip(1, 0) == playerChip)
+      my_tiles++;
+    else if (getChip(1, 0) == computerChip)
+      opp_tiles++;
+  }
+  if (getChip(0, 7) == Chip::Empty) {
+    if (getChip(0, 6) == playerChip)
+      my_tiles++;
+    else if (getChip(0, 6) == computerChip)
+      opp_tiles++;
+    if (getChip(1, 6) == playerChip)
+      my_tiles++;
+    else if (getChip(1, 6) == computerChip)
+      opp_tiles++;
+    if (getChip(1, 7) == playerChip)
+      my_tiles++;
+    else if (getChip(1, 7) == computerChip)
+      opp_tiles++;
+  }
+  if (getChip(7, 0) == Chip::Empty) {
+    if (getChip(7, 1) == playerChip)
+      my_tiles++;
+    else if (getChip(7, 1) == computerChip)
+      opp_tiles++;
+    if (getChip(6, 1) == playerChip)
+      my_tiles++;
+    else if (getChip(6, 1) == computerChip)
+      opp_tiles++;
+    if (getChip(6, 0) == playerChip)
+      my_tiles++;
+    else if (getChip(6, 0) == computerChip)
+      opp_tiles++;
+  }
+  if (getChip(7, 7) == Chip::Empty) {
+    if (getChip(6, 7) == playerChip)
+      my_tiles++;
+    else if (getChip(6, 7) == computerChip)
+      opp_tiles++;
+    if (getChip(6, 6) == playerChip)
+      my_tiles++;
+    else if (getChip(6, 6) == computerChip)
+      opp_tiles++;
+    if (getChip(7, 6) == playerChip)
+      my_tiles++;
+    else if (getChip(7, 6) == computerChip)
+      opp_tiles++;
+  }
+  l = -12.5 * (my_tiles - opp_tiles);
+
+  // Mobility
+  my_tiles = playerAvailableMoves.size();
+  opp_tiles = computerAvailableMoves.size();
+  if (my_tiles > opp_tiles)
+    m = (100.0 * my_tiles) / (my_tiles + opp_tiles);
+  else if (my_tiles < opp_tiles)
+    m = -(100.0 * opp_tiles) / (my_tiles + opp_tiles);
+  else
+    m = 0;
+
+  // final weighted score
+  double score = (10 * p) + (801.724 * c) + (382.026 * l) + (78.922 * m) +
+                 (74.396 * f) + (10 * d);
+  return score;
+}
 
 Board::~Board() {}
 
 Board::Board(const Board &other)
-    : playerChip(other.playerChip), computerChip(other.computerChip),
-      boardHash(other.boardHash) {
+    : playerChip(other.playerChip), computerChip(other.computerChip) {
   playerLayout = other.playerLayout;
   computerLayout = other.computerLayout;
   playerAvailableMoves = other.playerAvailableMoves;
@@ -459,8 +586,7 @@ Board::Board(const Board &other)
 }
 
 Board::Board(Board &&other)
-    : boardHash(other.boardHash), playerChip(other.playerChip),
-      computerChip(other.computerChip) {
+    : playerChip(other.playerChip), computerChip(other.computerChip) {
   playerLayout = std::move(other.playerLayout);
   computerLayout = std::move(other.computerLayout);
   playerAvailableMoves = std::move(other.playerAvailableMoves);
@@ -470,7 +596,6 @@ Board::Board(Board &&other)
 Board &Board::operator=(const Board &other) {
   playerChip = other.playerChip;
   computerChip = other.computerChip;
-  boardHash = other.boardHash;
   playerLayout = other.playerLayout;
   computerLayout = other.computerLayout;
   playerAvailableMoves = other.playerAvailableMoves;
@@ -479,7 +604,6 @@ Board &Board::operator=(const Board &other) {
 }
 
 Board &Board::operator=(Board &&other) {
-  boardHash = other.boardHash;
   playerChip = other.playerChip;
   computerChip = other.computerChip;
   playerLayout = std::move(other.playerLayout);
@@ -627,21 +751,6 @@ void Board::updateLayouts(AvailableMove &move, Current cur) {
       }
     }
   }
-}
-
-void Board::generateHash() {
-  boardHash = 0;
-  std::hash<std::string> strHash;
-  std::string tempHash = "";
-  for (int i = 0; i < 64; ++i) {
-    if (playerLayout.contains(i))
-      tempHash += std::to_string(static_cast<int>(playerChip));
-    else if (computerLayout.contains(i))
-      tempHash += std::to_string(static_cast<int>(computerChip));
-    else
-      tempHash += std::to_string(0);
-  }
-  boardHash = strHash(tempHash);
 }
 
 void Board::eraseFromLayout(int x, int y, Current cur) {
