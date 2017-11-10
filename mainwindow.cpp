@@ -17,10 +17,13 @@ MainWindow::MainWindow(QWidget *parent)
     setControlsEnabled(false);
     ui->frame->clearLayout();
     ui->frame->repaint();
+    ui->playerScore->setText("2");
+    ui->computerScore->setText("2");
   });
   connect(ui->endGame, &QPushButton::clicked,
           [&]() { setControlsEnabled(true); });
-  connect(ui->frame, &Canvas::gameFinished, [&]() { gameFinished(); });
+  connect(ui->frame, &Canvas::gameFinished, this, &MainWindow::gameFinished);
+  connect(ui->frame, &Canvas::updateScores, this, &MainWindow::updateScores);
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -48,4 +51,9 @@ void MainWindow::gameFinished() {
                            "Game over\nScore: " + score + winner,
                            QMessageBox::Ok);
   setControlsEnabled(true);
+}
+
+void MainWindow::updateScores(int player, int computer) {
+  ui->playerScore->setText(QString::number(player));
+  ui->computerScore->setText(QString::number(computer));
 }

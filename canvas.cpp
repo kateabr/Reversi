@@ -1,11 +1,11 @@
 ﻿#include "canvas.h"
 #include <QtConcurrent/QtConcurrent>
 
-Canvas::Canvas(QWidget *parent) : QWidget(parent) /*, cp(b)*/ {
+Canvas::Canvas(QWidget *parent) : QWidget(parent) {
   b.initializeLayouts();
+  connect(&cp, &ComputerOpponent::wait, this, &Canvas::toWait);
+  connect(&cp, &ComputerOpponent::finished, this, &Canvas::canContinue);
 }
-
-const Board &Canvas::getBoard() { return b; }
 
 void Canvas::computerPlayerMakeMove() {
   AvailableMove move = cp.makeMove(b);
@@ -21,6 +21,10 @@ int Canvas::computerScore() { return b.computerScore(); }
 
 void Canvas::clearLayout() { b.initializeLayouts(); }
 
+void Canvas::toWait() {}
+
+void Canvas::canContinue() {}
+
 void Canvas::setChips(Chip user, bool initLayout) {
   if (b.getUserChip() != user) {
     b.changeChips();
@@ -33,7 +37,9 @@ void Canvas::setChips(Chip user, bool initLayout) {
 void Canvas::setStartGame(bool s) {
   gameStarted = s;
   if (userChip == Chip::White) {
-    cp.makeRandomMove(b);
+    computerPlayerMakeMove();
+    emit updateScores(b.playerScore(), b.computerScore());
+    repaint();
   }
 }
 
@@ -92,12 +98,14 @@ void Canvas::mousePressEvent(QMouseEvent *e) {
   if ((b.getChip(x, y) != Chip::Empty) || (!b.canPutChip(x, y, Current::User)))
     return;
   userMakeMove(x, y);
+  emit updateScores(b.playerScore(), b.computerScore());
   repaint();
   if (b.final(Current::Computer)) {
     emit gameFinished();
     return;
   }
   computerPlayerMakeMove();
+  emit updateScores(b.playerScore(), b.computerScore());
   repaint();
   if (b.final(Current::User)) {
     emit gameFinished();

@@ -9,7 +9,6 @@ class Canvas : public QWidget {
   Q_OBJECT
 public:
   explicit Canvas(QWidget *parent = nullptr);
-  const Board &getBoard();
   void computerPlayerMakeMove();
   void userMakeMove(int x, int y);
   int playerScore();
@@ -20,9 +19,12 @@ public slots:
   void setChips(Chip user, bool initLayout);
   void setStartGame(bool s);
   void clearLayout();
+  void toWait();
+  void canContinue();
 
 signals:
   void gameFinished();
+  void updateScores(int player, int computer);
 
 protected:
   void paintEvent(QPaintEvent *);

@@ -3,14 +3,20 @@
 
 #include "board.h"
 
-class ComputerOpponent {
+class ComputerOpponent : public QObject {
+  Q_OBJECT
+
 public:
-  ComputerOpponent();
+  ComputerOpponent(QObject *parent = nullptr);
 
   AvailableMove makeMove(Board &b);
   AvailableMove makeRandomMove(Board &b);
 
   void setDifficulty(int val);
+
+signals:
+  void wait();
+  void finished();
 
 private:
   int difficulty = 0;

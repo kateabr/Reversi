@@ -1,7 +1,7 @@
 #include "computeropponent.h"
 #include <QMap>
 
-ComputerOpponent::ComputerOpponent() {}
+ComputerOpponent::ComputerOpponent(QObject *parent) : QObject(parent) {}
 
 AvailableMove ComputerOpponent::makeRandomMove(Board &b) {
   int rnd = rand() % b.getComputerAvailableMoves().size();

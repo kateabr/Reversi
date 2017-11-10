@@ -16,9 +16,10 @@ public:
 
 public slots:
   void setControlsEnabled(bool val);
+  void gameFinished();
+  void updateScores(int player, int computer);
 
 private:
-  void gameFinished();
   Ui::MainWindow *ui;
 };
 
