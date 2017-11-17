@@ -14,11 +14,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->frame->setDifficulty(val);
   });
   connect(ui->startGame, &QPushButton::clicked, [&]() {
-    setControlsEnabled(false);
     ui->frame->clearLayout();
     ui->frame->repaint();
     ui->playerScore->setText("2");
     ui->computerScore->setText("2");
+    setControlsEnabled(false);
   });
   connect(ui->endGame, &QPushButton::clicked,
           [&]() { setControlsEnabled(true); });

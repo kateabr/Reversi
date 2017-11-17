@@ -1,4 +1,5 @@
 ﻿#include "canvas.h"
+#include <QDebug>
 #include <QtConcurrent/QtConcurrent>
 
 Canvas::Canvas(QWidget *parent) : QWidget(parent) {
@@ -26,17 +27,18 @@ void Canvas::toWait() {}
 void Canvas::canContinue() {}
 
 void Canvas::setChips(Chip user, bool initLayout) {
-  if (b.getUserChip() != user) {
+  if (b.getUserChip() != user)
     b.changeChips();
-    repaint();
-  }
-  if (initLayout)
+  if (initLayout || !gameStarted) {
     b.initializeLayouts();
+    emit updateScores(b.playerScore(), b.computerScore());
+  }
+  repaint();
 }
 
 void Canvas::setStartGame(bool s) {
   gameStarted = s;
-  if (userChip == Chip::White) {
+  if (gameStarted && (b.getUserChip() == Chip::White)) {
     computerPlayerMakeMove();
     emit updateScores(b.playerScore(), b.computerScore());
     repaint();

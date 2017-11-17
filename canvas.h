@@ -14,10 +14,10 @@ public:
   int playerScore();
   int computerScore();
   void setDifficulty(int val);
+  void setStartGame(bool s);
 
 public slots:
   void setChips(Chip user, bool initLayout);
-  void setStartGame(bool s);
   void clearLayout();
   void toWait();
   void canContinue();
@@ -33,7 +33,6 @@ protected:
 private:
   Board b;
   ComputerOpponent cp;
-  Chip userChip = Chip::Black;
   bool gameStarted = false;
 };
 
